@@ -137,6 +137,34 @@ public class DBConn {
 	}
 
 	
+	int execSQL_InsertFlagClaim(int clm_id, String code, int ruleID, int Sub_Rule_Line, String SQL) {
+		// Insert each claim into the flagged table
+		
+				
+		//System.out.println(SQL);
+		//return 0;
+
+		try {
+			//Step 1. Connection to the db
+			conn = DriverManager.getConnection(dbUrl);
+		
+			// Create statement object
+			stmt = conn.createStatement();
+		
+			// 3. Execute SQL query
+			stmt.executeUpdate(SQL);
+			
+		}
+		
+		// Handle any errors that may have occurred.
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return 0;
+	}
+
+	
 	/*public ResultSet execSQL_returnRS(String SQL)
 	{
 	

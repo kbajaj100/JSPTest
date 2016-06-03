@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -26,7 +27,29 @@ public class DBExecute {
 	static DBConn myconn = new DBConn();
 	
 	static ArrayList<Integer> RuleList = new ArrayList<Integer>();
+	static int Run_ID = 0;
+	static LocalDateTime Datetime;
+	
+	public static int setRUN_ID(){
 		
+		SQL = "select max(RUN_ID) count from rcmods.FACT_GIC_STG";
+		
+		Run_ID = myconn.execSQL_returnint(SQL);
+		++Run_ID;
+		return Run_ID;
+	}
+	
+	public static int getRun_ID(){
+		return Run_ID;
+	}
+	
+	public static void setDate(){
+		
+		Datetime = LocalDateTime.now();
+		//return Datetime;
+	}
+	
+	
 	public static int getRuleCount() throws FileNotFoundException, IOException, SQLException{
 		//Returns the number of rule IDs in the database
 		
@@ -158,7 +181,7 @@ public class DBExecute {
 	
 	public static int getRuleClaimCount(int rulenum){
 		
-		SQL = "select COUNT(distinct CLM_ID) as count from rcmods.FACT_GIC_STG where Rule_ID = " + rulenum + " group by Rule_ID";	
+		SQL = "select COUNT(distinct CLM_ID) as count from rcmods.FACT_GIC_STG where Rule_ID = " + rulenum + " and RUN_ID = " + Run_ID + " group by Rule_ID";	
 		int ruleclaimcouunt = myconn.execSQL_returnint(SQL);
 		return ruleclaimcouunt;
 	}
@@ -211,7 +234,7 @@ public class DBExecute {
 
 	}
 
-	public void ExecRule_RuleTypeNum(int ruleID, int RuleTypeNumber) {
+	public void ExecRule_RuleTypeNum(int ruleID, int RuleTypeNumber, int runid) {
 		// TODO Auto-generated method stub
 		
 		//Get the Rule Type for the given Rule ID and Rule Type Number
@@ -222,11 +245,11 @@ public class DBExecute {
 		// Construct SQL for the Rules
 		if ((RightRuleType == 1) || (RightRuleType == 2))// || (RuleType == 3)) 
 		{
-			ExecRule_123_Left(ruleID, RightRuleType, RuleTypeNumber);
+			ExecRule_123_Left(ruleID, RightRuleType, RuleTypeNumber, runid);
 		}
 	}
 	
-	public void ExecRule_123_Left(int ruleID, int RightRuleType, int RuleTypeNumber)
+	public void ExecRule_123_Left(int ruleID, int RightRuleType, int RuleTypeNumber, int runID)
 	{
 		
 		int dummy = 1;
@@ -277,7 +300,7 @@ public class DBExecute {
 				if (conn != null) try { conn.close(); } catch(Exception e) {}
 			}
 			
-			ExecRule_1_Right(Claims, ruleID, RightRuleType, RuleTypeNumber);
+			ExecRule_1_Right(Claims, ruleID, RightRuleType, RuleTypeNumber, runID);
 			
 		}
 
@@ -332,12 +355,16 @@ public class DBExecute {
 					"(a11.CLM_ID = a12.CLM_ID)"; 
 			System.out.println(SQL);
 		}
+		else if (lefttype == 3){
+			SQL = "";
+			System.out.println(SQL);
+		}
 		
 		return SQL;
 	}
 
 
-	private void ExecRule_1_Right(String claims_list, int ruleID, int RightRuleType, int RuleTypeNumber) {
+	private void ExecRule_1_Right(String claims_list, int ruleID, int RightRuleType, int RuleTypeNumber, int runID) {
 		// TODO Auto-generated method stub
 
 		int Sub_Rule_count;
@@ -412,12 +439,12 @@ public class DBExecute {
 
 			}
 
-			count = execFlagClaimSQL(ruleID, RightRuleType, RuleTypeNumber, code, i);
+			count = execFlagClaimSQL(ruleID, RightRuleType, RuleTypeNumber, code, i, runID);
 		}
 
 	}
 
-	private int execFlagClaimSQL(int ruleID, int RuleType, int RuleTypeNumber, String code, int Sub_Rule_Line) {
+	private int execFlagClaimSQL(int ruleID, int RuleType, int RuleTypeNumber, String code, int Sub_Rule_Line, int runID) {
 	// Get the list of claims that are flagged	
 
 		System.out.println(SQL);
@@ -438,8 +465,8 @@ public class DBExecute {
 			while (rs.next()){
 				
 				int clm_id = rs.getInt("CLM_ID");//.getString("count");
-				//System.out.println(clm_id);
-				dummy = execInsertFlagClaim(clm_id, code, ruleID, Sub_Rule_Line);
+				//System.out.println(clm_id);	
+				dummy = execInsertFlagClaim(clm_id, code, ruleID, Sub_Rule_Line, runID);
 			}
 
 		}
@@ -460,43 +487,28 @@ public class DBExecute {
 	}
 
 
-	private int execInsertFlagClaim(int clm_id, String code, int ruleID, int Sub_Rule_Line) {
+	private int execInsertFlagClaim(int clm_id, String code, int ruleID, int Sub_Rule_Line, int runID) {
 		// Insert each claim into the flagged table
 		
-		dbUrl = myconn.getdbUrl();
+		//dbUrl = myconn.getdbUrl();
+		
 		
 		SQL = "INSERT INTO rcmods.FACT_GIC_STG " +
 			  "("+
 			  "CLM_ID, " +
 			  "RULE_ID, " +
 			  "SUB_RULE_ID, " +
-			  "CPT_CODE " + 
-			  //"RUN_DATE," +
+			  "CPT_CODE, " + 
+			  "RUN_ID " +  
 			  ") " +
 			  "VALUES "+
-			  "(" + clm_id + ", " + ruleID + ", " + Sub_Rule_Line + ", " + "'" + code + "')";// + ", select cast(GETDATE() as DATE))";
+			  "(" + clm_id + ", " + ruleID + ", " + Sub_Rule_Line + ", '" + code + "', " + runID + ")";
 		
-		System.out.println(SQL);
-		//return 0;
-
-		try {
-			//Step 1. Connection to the db
-			conn = DriverManager.getConnection(dbUrl);
 		
-			// Create statement object
-			stmt = conn.createStatement();
+		myconn.execSQL_InsertFlagClaim(clm_id, code, ruleID, Sub_Rule_Line, SQL);
 		
-			// 3. Execute SQL query
-			stmt.executeUpdate(SQL);
-			
-		}
-		
-		// Handle any errors that may have occurred.
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-
 		return 0;
+
 	}
 
 
