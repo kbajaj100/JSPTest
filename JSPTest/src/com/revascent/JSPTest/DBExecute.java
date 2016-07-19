@@ -50,6 +50,16 @@ public class DBExecute {
 	}
 	
 	
+	public static String getdbUrl() throws FileNotFoundException, IOException, SQLException{
+		//Returns the number of rule IDs in the database
+		
+		myconn.setDBConn("C:/Props/RulesEngine/DBprops.properties");
+		
+		dbUrl = myconn.getdbUrl();
+	
+		return dbUrl;
+	}
+	
 	public static int getRuleCount() throws FileNotFoundException, IOException, SQLException{
 		//Returns the number of rule IDs in the database
 		

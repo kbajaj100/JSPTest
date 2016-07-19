@@ -38,7 +38,7 @@ public class DBConn {
 			user = props.getProperty("user");
 			pass = props.getProperty("password");
 			dbName = props.getProperty("dbName");
-			dbUrl = props.getProperty("dbUrl"); // +  ";databaseName="+ dbName + ";user=" + user + ";password=" + pass;
+			dbUrl = props.getProperty("dbUrl"); //  +  ";databaseName="+ dbName + ";user=" + user + ";password=" + pass;
 			//System.out.println(dbUrl);
 			
 	}
