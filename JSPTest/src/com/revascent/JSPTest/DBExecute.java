@@ -53,7 +53,7 @@ public class DBExecute {
 	public static int getRuleCount() throws FileNotFoundException, IOException, SQLException{
 		//Returns the number of rule IDs in the database
 		
-		myconn.setDBConn("C:/RulesEngine/DBprops.properties");
+		myconn.setDBConn("C:/Props/RulesEngine/DBprops.properties");
 		
 		SQL = "select COUNT(distinct Rule_ID) count from rcmods.Rule_sheet_Index where Status = 'A'";
 	
@@ -68,7 +68,7 @@ public class DBExecute {
 	public static int getRuleCountAll() throws FileNotFoundException, IOException, SQLException{
 		//Returns the number of rule IDs in the database
 		
-		myconn.setDBConn("C:/RulesEngine/DBprops.properties");
+		myconn.setDBConn("C:/Props/RulesEngine/DBprops.properties");
 		
 		SQL = "select COUNT(distinct Rule_ID) count from rcmods.Rule_sheet_Index";
 	
@@ -356,14 +356,47 @@ public class DBExecute {
 			System.out.println(SQL);
 		}
 		else if (lefttype == 3){
-			SQL = "";
-			System.out.println(SQL);
+			String SQL_in = "";
+			SQL_in = getSQLin_Left_RuleType3(ruleID, ruleType, ruleTypeNumber);
+			//System.out.println(SQL);
+			
+			SQL = "select CLM_ID CLM_ID, count(CPT_SEQUENCE_ID) count from rcmdw.FACT_CLAIM_DETAIL where CPT_Code in " + SQL_in + " group by CLM_ID";
+
+			
 		}
 		
 		return SQL;
 	}
 
 
+	private String getSQLin_Left_RuleType3(int ruleID, int ruleType, int ruleTypeNumber) {
+		
+		int num_lines = 0;
+		
+		SQL = "select count(Rule_Left_Line_ID) count from rcmods.Rule_Sheet_Left where Rule_ID = " + ruleID;
+		
+		num_lines = myconn.execSQL_returnint(SQL);
+		
+		String SQL_in = "(";
+		
+		for (int i = 1; i <= num_lines; ++i){
+			
+			SQL = "select Rule_Primary_Code count from rcmods.Rule_Sheet_Left where Rule_ID = " + ruleID + " and Rule_Left_Line_ID = " + i;
+			code = myconn.execSQL_returnString(SQL);
+			
+			if (i == 1){
+				SQL_in = SQL_in + "'" + code + "'";
+			}
+			else {
+				SQL_in = ", '" + code + "'";
+			}
+		}
+		
+		SQL_in = SQL_in + ")";
+		
+		return SQL_in;
+	}
+	
 	private void ExecRule_1_Right(String claims_list, int ruleID, int RightRuleType, int RuleTypeNumber, int runID) {
 		// TODO Auto-generated method stub
 
