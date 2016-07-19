@@ -8,7 +8,7 @@ Let's test out if this works.<br>
 
 Number of Rules is: <%= DBExecute.getRuleCountAll() %>
 <br>
-dburl is: <%=DBExecute.getdbUrl() %>
+
 <br>
 <%= DBExecute.getSQL() %>
 <br><br>
