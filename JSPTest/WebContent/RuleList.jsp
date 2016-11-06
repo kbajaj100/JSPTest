@@ -6,6 +6,8 @@
 
 Let's test out if this works.<br>
 
+
+<br>
 Number of Rules is: <%= DBExecute.getRuleCountAll() %>
 <br>
 
