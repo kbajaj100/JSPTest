@@ -45,8 +45,8 @@ public class MainClass {
 		int RuleTypeCount; // Number of Rule types in the rule
 		int RuleID;
 		
-		RuleID = myDB.getRuleID(rulecounter);
-		
+		RuleID = myDB.getRuleID(rulecounter); //gets the rule id for that rule counter
+
 		RuleTypeCount = myDB.getRuleTypeNums(RuleID);
 		System.out.println("Rule ID is: " + RuleID);
 		System.out.println("Rule Type Count is: " + RuleTypeCount);
