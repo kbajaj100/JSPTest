@@ -47,7 +47,7 @@ for(int i = 0; i<count; ++i){
 		<!-- <td><form action="demo_form.asp" method="get"> <button type="submit" formaction="RuleResult.jsp">Submit</button></td> -->
 	</tr><%}%>
 </table>
-<br><br>
+<br><br>Inserting new line to test Jenkins.<br>
 <form action="RuleResult.jsp" method="get"> <button type="submit" formaction="RuleResult.jsp">Run All Rules</button>
 
 </body>

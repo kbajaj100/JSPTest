@@ -337,7 +337,7 @@ public class DBExecute {
 					//" and Rule_Type_ID = " + ruleType + 
 					") " + 
 					"group by CLM_ID " + 
-					"having COUNT(CPT_CODE_ID) = 2)";
+					"having COUNT(CPT_CODE) = 2)";
 		}
 		else if (lefttype == 2)
 		{
