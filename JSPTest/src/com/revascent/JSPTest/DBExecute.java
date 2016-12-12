@@ -253,7 +253,7 @@ public class DBExecute {
 		RightRuleType = getRuleType(ruleID, RuleTypeNumber);
 		
 		// Construct SQL for the Rules
-		if ((RightRuleType == 1) || (RightRuleType == 2))// || (RuleType == 3)) 
+		if ((RightRuleType == 1) || (RightRuleType == 2) || (RightRuleType == 10)) 
 		{
 			ExecRule_123_Left(ruleID, RightRuleType, RuleTypeNumber, runid);
 		}
@@ -481,7 +481,26 @@ public class DBExecute {
 					  "and Rule_Sub_ID = " + i + ")))";
 
 			}
-
+			else if (RightRuleType ==10)
+			{
+				SQL = "select distinct a11.CLM_ID " +
+					  "from rcmdw.FACT_CLAIM_DETAIL a11 "+
+					  "where a11.CLM_ID in " +
+					  claims_list + " and " + 
+					  "a11.CLM_ID not in " +
+					  "( " +  
+					  "select CLM_ID " +
+					  "from rcmdw.FACT_CLAIM_DETAIL " +
+					  "where CPT_CODE in " + 
+					  "(select Rule_Sub_Primary_Code1 " + 
+					  "from rcmods.Rule_Sheet " +
+					  "where Rule_ID = " + ruleID + " " + 
+					  "and Rule_Sub_ID = " + i + ")" +
+					  "and CLM_ID in " + claims_list + 
+					  ")";
+				
+			}
+			
 			count = execFlagClaimSQL(ruleID, RightRuleType, RuleTypeNumber, code, i, runID);
 		}
 
