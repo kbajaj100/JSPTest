@@ -10,7 +10,10 @@
 <body>
 
 <%= MainClass.MainExecute() %>
+<br><br>
+Run_ID is: <%= DBExecute.setRUN_ID()-1%>
 
+<br><br>
 <%
 int count = DBExecute.getRuleCount();
 int[] rulelist = new int[count];
@@ -29,7 +32,7 @@ for(int i = 0; i<count; ++i){
 int[] ruleclaimcount = new int[count];
 
 for(int i = 0; i<count; ++i){
-	ruleclaimcount[i] = DBExecute.getRuleClaimCount(rulelist[i]);
+	ruleclaimcount[i] = DBExecute.getRuleClaimCount(rulelist[i], DBExecute.setRUN_ID());
 }
 
 %>

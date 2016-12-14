@@ -18,7 +18,7 @@ public class MainClass {
 	
 	public static String MainExecute() throws FileNotFoundException, IOException, SQLException {
 
-		DBExecute myDB = new DBExecute();
+		DBRulesEngine myDB = new DBRulesEngine();
 
 		int rulecount; // # of active rules
 		int dummy = 0; 
@@ -39,7 +39,7 @@ public class MainClass {
 		return ("Completed processing " + i + " rules for Run_ID: " + runid);
 	}
 
-	private static int ExecuteRule(int rulecounter, DBExecute myDB, int runid) {
+	private static int ExecuteRule(int rulecounter, DBRulesEngine myDB, int runid) {
 		// TODO Auto-generated method stub
 
 		int RuleTypeCount; // Number of Rule types in the rule
