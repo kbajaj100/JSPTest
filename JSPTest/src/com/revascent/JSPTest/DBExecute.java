@@ -23,6 +23,7 @@ public class DBExecute {
 	private static ResultSet rs= null;
 	
 	private static int count = 0;
+	private static int left_sub_count = 0;
 	private String code;
 	static DBConn myconn = new DBConn();
 	
@@ -265,10 +266,17 @@ public class DBExecute {
 		int dummy = 1;
 		System.out.println();
 		
+		SQL = "select COUNT(distinct Left_Sub_Rule_ID) "
+				+ "from rcmods.Rule_Sheet_Left "
+				+ "where Rule_ID = " + ruleID;
+		
+		left_sub_count = myconn.execSQL_returnint(SQL); 
+				
 		dbUrl = myconn.getdbUrl();
 		
 		Claims = "(";
 	
+		
 		SQL = getSQL_Left(ruleID, RightRuleType, RuleTypeNumber);
 			
 					
@@ -311,8 +319,11 @@ public class DBExecute {
 			}
 			
 			ExecRule_1_Right(Claims, ruleID, RightRuleType, RuleTypeNumber, runID);
+		
+		
+		
 			
-		}
+	}
 
 	private String getSQL_Left(int ruleID, int ruleType, int ruleTypeNumber) {
 		// TODO Auto-generated method stub
