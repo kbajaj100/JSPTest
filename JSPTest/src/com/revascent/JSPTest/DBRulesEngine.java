@@ -263,7 +263,7 @@ public class DBRulesEngine {
 	public void ExecRule_123_Left(int ruleID, int RightRuleType, int RuleTypeNumber, int runID)
 	{
 
-		int dummy = 1;
+		
 		System.out.println();
 
 		SQL = "select COUNT(distinct Left_Sub_Rule_ID) count "
@@ -272,13 +272,23 @@ public class DBRulesEngine {
 
 		left_sub_count = myconn.execSQL_returnint(SQL); 
 
-		dbUrl = myconn.getdbUrl();
+		if (left_sub_count == 1)
+			ExecRule_Left_Sub_Count_1(ruleID, RightRuleType, RuleTypeNumber, runID);
+		
+		ExecRule_1_Right(Claims, ruleID, RightRuleType, RuleTypeNumber, runID);
+		
+	}
 
+	private void ExecRule_Left_Sub_Count_1(int ruleID, int RightRuleType, int RuleTypeNumber, int runID) {
+		// TODO Auto-generated method stub
+		
+		dbUrl = myconn.getdbUrl();
+		int dummy = 1;
 		Claims = "(";
 
 		for (int i = 1; i <= left_sub_count; ++i){
 		
-			SQL = getSQL_Left(ruleID, RightRuleType, RuleTypeNumber);
+			SQL = getSQL_Left(ruleID, RightRuleType, RuleTypeNumber, i);
 			
 				//System.out.println(SQL);
 				try {
@@ -317,12 +327,10 @@ public class DBRulesEngine {
 					if (stmt != null) try { stmt.close(); } catch(Exception e) {}
 					if (conn != null) try { conn.close(); } catch(Exception e) {}
 				}
-				
-				ExecRule_1_Right(Claims, ruleID, RightRuleType, RuleTypeNumber, runID);
 		}
 	}
 
-	private String getSQL_Left(int ruleID, int ruleType, int ruleTypeNumber) {
+	private String getSQL_Left(int ruleID, int ruleType, int ruleTypeNumber, int left_sub_counter) {
 		// TODO Auto-generated method stub
 		System.out.println("Rule ID is : " + ruleID);
 		System.out.println("Right Rule Type is : " + ruleType);
@@ -341,8 +349,8 @@ public class DBRulesEngine {
 					"where CPT_CODE = " +  
 					"(select distinct Rule_Primary_Code " + 
 					"from rcmods.Rule_Sheet_Left " + 
-					"where Rule_ID = " + ruleID + 
-					//" and Rule_Type_ID = " + ruleType + 
+					"where Rule_ID = " + ruleID + " " +  
+					"and Left_Sub_Rule_ID = " + left_sub_counter + " " +  
 					") " + 
 					"group by CLM_ID " + 
 					"having COUNT(CPT_CODE) = 2)";
@@ -356,8 +364,9 @@ public class DBRulesEngine {
 					"where CPT_CODE in " + 
 					"(select Rule_Primary_Code " + 
 					"from rcmods.Rule_Sheet_Left " +
-					"where Rule_ID = " + ruleID + " and " +
-					"Rule_Left_Line_ID = 1) " +
+					"where Rule_ID = " + ruleID + " " +  
+					"and Left_Sub_Rule_ID = " + left_sub_counter + " " +  
+					"and Rule_Left_Line_ID = 1) " +
 					"group by CLM_ID " +
 					"having COUNT(CPT_CODE) = 1) a11 " +
 					"join " +
@@ -366,8 +375,9 @@ public class DBRulesEngine {
 					"where CPT_CODE in " +
 					"(select Rule_Primary_Code " +
 					"from rcmods.Rule_Sheet_Left " + 
-					"where Rule_ID = " + ruleID + " and " +
-					"Rule_Left_Line_ID = 2) " +
+					"where Rule_ID = " + ruleID + " " +  
+					"and Left_Sub_Rule_ID = " + left_sub_counter + " " +  
+					"and Rule_Left_Line_ID = 2) " +
 					"group by CLM_ID " +
 					"having COUNT(CPT_CODE) = 1) a12 on " +
 					"(a11.CLM_ID = a12.CLM_ID)"; 
