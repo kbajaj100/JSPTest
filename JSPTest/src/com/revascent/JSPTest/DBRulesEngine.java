@@ -262,64 +262,64 @@ public class DBRulesEngine {
 	
 	public void ExecRule_123_Left(int ruleID, int RightRuleType, int RuleTypeNumber, int runID)
 	{
-		
+
 		int dummy = 1;
 		System.out.println();
-		
-		SQL = "select COUNT(distinct Left_Sub_Rule_ID) "
+
+		SQL = "select COUNT(distinct Left_Sub_Rule_ID) count "
 				+ "from rcmods.Rule_Sheet_Left "
 				+ "where Rule_ID = " + ruleID;
-		
+
 		left_sub_count = myconn.execSQL_returnint(SQL); 
-				
+
 		dbUrl = myconn.getdbUrl();
-		
+
 		Claims = "(";
-	
+
+		for (int i = 1; i <= left_sub_count; ++i){
 		
-		SQL = getSQL_Left(ruleID, RightRuleType, RuleTypeNumber);
+			SQL = getSQL_Left(ruleID, RightRuleType, RuleTypeNumber);
 			
-					
-			//System.out.println(SQL);
-			try {
-				//Step 1. Connection to the db
-				conn = DriverManager.getConnection(dbUrl);
-			
-				// Create statement object
-				stmt = conn.createStatement();
-			
-				// 3. Execute SQL query
-				rs = stmt.executeQuery(SQL);
+				//System.out.println(SQL);
+				try {
+					//Step 1. Connection to the db
+					conn = DriverManager.getConnection(dbUrl);
 				
-				//4. Process result set
-				while (rs.next()){
+					// Create statement object
+					stmt = conn.createStatement();
+				
+					// 3. Execute SQL query
+					rs = stmt.executeQuery(SQL);
 					
-					int clm_id = rs.getInt("CLM_ID");//.getString("count");
-					System.out.println(clm_id);
-					if (dummy != 1)
-						Claims = Claims + ", " + clm_id;
-					else Claims = Claims + clm_id;
-					++dummy;
+					//4. Process result set
+					while (rs.next()){
+						
+						int clm_id = rs.getInt("CLM_ID");//.getString("count");
+						System.out.println(clm_id);
+						if (dummy != 1)
+							Claims = Claims + ", " + clm_id;
+						else Claims = Claims + clm_id;
+						++dummy;
+					}
+					Claims = Claims + ")";
+					System.out.println(Claims);
 				}
-				Claims = Claims + ")";
-				System.out.println(Claims);
-			}
+				
+				// Handle any errors that may have occurred.
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			
-			// Handle any errors that may have occurred.
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		
-			
-			finally {
-				//close(myConn, myStmt, myRS);
-				if (rs   != null) try { rs.close();   } catch(Exception e) {}
-				if (stmt != null) try { stmt.close(); } catch(Exception e) {}
-				if (conn != null) try { conn.close(); } catch(Exception e) {}
-			}
-			
-			ExecRule_1_Right(Claims, ruleID, RightRuleType, RuleTypeNumber, runID);
-		
+				
+				finally {
+					//close(myConn, myStmt, myRS);
+					if (rs   != null) try { rs.close();   } catch(Exception e) {}
+					if (stmt != null) try { stmt.close(); } catch(Exception e) {}
+					if (conn != null) try { conn.close(); } catch(Exception e) {}
+				}
+				
+				ExecRule_1_Right(Claims, ruleID, RightRuleType, RuleTypeNumber, runID);
+		}
 	}
 
 	private String getSQL_Left(int ruleID, int ruleType, int ruleTypeNumber) {
