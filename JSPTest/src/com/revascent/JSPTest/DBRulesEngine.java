@@ -376,10 +376,10 @@ public class DBRulesEngine {
 			SQL = 	"select distinct a11.CLM_ID CLM_ID " +
 					"from " + 
 					"(select CLM_ID " + 
-					"from rcmdw.FACT_CLAIM_DETAIL " + 
+					"from " + myDBIndex.getClaims_Table() + " " + 
 					"where CPT_CODE in " + 
 					"(select Rule_Primary_Code " + 
-					"from rcmods.Rule_Sheet_Left " +
+					"from " + myDBIndex.getRS_Left() + " " +
 					"where Rule_ID = " + ruleID + " " +  
 					"and Left_Sub_Rule_ID = " + left_sub_counter + " " +  
 					"and Rule_Left_Line_ID = 1) " +
@@ -387,10 +387,10 @@ public class DBRulesEngine {
 					"having COUNT(CPT_CODE) = 1) a11 " +
 					"join " +
 					"(select CLM_ID " +
-					"from rcmdw.FACT_CLAIM_DETAIL " +
+					"from " + myDBIndex.getClaims_Table() + " " +
 					"where CPT_CODE in " +
 					"(select Rule_Primary_Code " +
-					"from rcmods.Rule_Sheet_Left " + 
+					"from " + myDBIndex.getRS_Left() + " " +
 					"where Rule_ID = " + ruleID + " " +  
 					"and Left_Sub_Rule_ID = " + left_sub_counter + " " +  
 					"and Rule_Left_Line_ID = 2) " +
@@ -404,7 +404,9 @@ public class DBRulesEngine {
 			SQL_in = getSQLin_Left_RuleType3(ruleID, ruleType, ruleTypeNumber);
 			//System.out.println(SQL);
 			
-			SQL = "select CLM_ID CLM_ID, count(CPT_SEQUENCE_ID) count from rcmdw.FACT_CLAIM_DETAIL where CPT_Code in " + SQL_in + " group by CLM_ID";
+			SQL = "select CLM_ID CLM_ID, count(CPT_SEQUENCE_ID) count " + 
+				  "from " + myDBIndex.getClaims_Table() + " " + 
+				  "where CPT_Code in " + SQL_in + " group by CLM_ID";
 
 			
 		}
