@@ -419,7 +419,9 @@ public class DBRulesEngine {
 		
 		int num_lines = 0;
 		
-		SQL = "select count(Rule_Left_Line_ID) count from rcmods.Rule_Sheet_Left where Rule_ID = " + ruleID;
+		SQL = "select count(Rule_Left_Line_ID) count " + 
+			  "from " + myDBIndex.getRS_Left() + " " +  
+			  "where Rule_ID = " + ruleID;
 		
 		num_lines = myconn.execSQL_returnint(SQL);
 		
@@ -427,7 +429,9 @@ public class DBRulesEngine {
 		
 		for (int i = 1; i <= num_lines; ++i){
 			
-			SQL = "select Rule_Primary_Code count from rcmods.Rule_Sheet_Left where Rule_ID = " + ruleID + " and Rule_Left_Line_ID = " + i;
+			SQL = "select Rule_Primary_Code count " + 
+				  "from " +  myDBIndex.getRS_Left() + " " +
+				  "where Rule_ID = " + ruleID + " and Rule_Left_Line_ID = " + i;
 			code = myconn.execSQL_returnString(SQL);
 			
 			if (i == 1){
@@ -451,7 +455,7 @@ public class DBRulesEngine {
 		
 		// Get the number of sub rules for that ruleID and Rule Type
 		SQL = "select max(Rule_Sub_ID)  count " + 
-			  "from rcmods.Rule_sheet " + 
+			  "from " + myDBIndex.getRS() + " " +  
 			  "where Rule_ID = " + ruleID  + " " +
 			  "and Rule_Type_number = " + RuleTypeNumber;
 		
@@ -466,7 +470,7 @@ public class DBRulesEngine {
 			code = "";
 			
 			SQL = "select Missing_Value code " +
-				  "from rcmods.Rule_sheet " +
+				  "from " + myDBIndex.getRS() + " " +
 				  "where Rule_ID = " + ruleID + " " +
 				  "and Rule_Type_number = " + RuleTypeNumber + " " +
 				  "and Rule_Sub_ID = " + i;
@@ -481,7 +485,7 @@ public class DBRulesEngine {
 			if (RightRuleType ==1)
 			{
 				SQL = "select a11.CLM_ID CLM_ID " +
-					  "from rcmdw.FACT_CLAIM_DETAIL a11 " +
+					  "from " + myDBIndex.getClaims_Table() + " a11 " +
 					  "where a11.CPT_Code in ('" +  
 					  code + "') " +
 					  "and CLM_ID in " +
@@ -494,13 +498,13 @@ public class DBRulesEngine {
 			{
 				
 				SQL = "select distinct a11.CLM_ID " +
-					  "from rcmdw.FACT_CLAIM_DETAIL a11 "+
+					  "from " + myDBIndex.getClaims_Table() + " a11 " +
 					  "join " +
 					  "(select CLM_ID " +
-					  "from rcmdw.FACT_CLAIM_DETAIL " +
+					  "from " + myDBIndex.getClaims_Table() + " " +
 					  "where CPT_CODE in " + 
 					  "(select Rule_Sub_Primary_Code1 " + 
-					  "from rcmods.Rule_Sheet " +
+					  "from " + myDBIndex.getRS() + " " + 
 					  "where Rule_ID = " + ruleID + " " + 
 					  "and Rule_Sub_ID = " + i + ")) a12 on " +
 					  "(a11.CLM_ID = a12.CLM_ID) " +
@@ -509,10 +513,10 @@ public class DBRulesEngine {
 					  "a11.CLM_ID not in " +
 					  "( " +  
 					  "(select distinct CLM_ID " +
-					  "from rcmdw.FACT_CLAIM_DETAIL " +
+					  "from " + myDBIndex.getClaims_Table() + " " +
 					  "where CPT_CODE in " + 
 					  "(select Missing_Value " +
-					  "from rcmods.Rule_Sheet " + 
+					  "from " + myDBIndex.getRS() + " " +  
 					  "where Rule_ID = " + ruleID + " " + 
 					  "and Rule_Sub_ID = " + i + ")))";
 
@@ -520,16 +524,16 @@ public class DBRulesEngine {
 			else if (RightRuleType ==10)
 			{
 				SQL = "select distinct a11.CLM_ID " +
-					  "from rcmdw.FACT_CLAIM_DETAIL a11 "+
+					  "from " + myDBIndex.getClaims_Table() + " a11 " +
 					  "where a11.CLM_ID in " +
 					  claims_list + " and " + 
 					  "a11.CLM_ID not in " +
 					  "( " +  
 					  "select CLM_ID " +
-					  "from rcmdw.FACT_CLAIM_DETAIL " +
+					  "from " + myDBIndex.getClaims_Table() + " " +
 					  "where CPT_CODE in " + 
 					  "(select Rule_Sub_Primary_Code1 " + 
-					  "from rcmods.Rule_Sheet " +
+					  "from " + myDBIndex.getRS() + " " +
 					  "where Rule_ID = " + ruleID + " " + 
 					  "and Rule_Sub_ID = " + i + ")" +
 					  "and CLM_ID in " + claims_list + 
@@ -591,7 +595,7 @@ public class DBRulesEngine {
 		//dbUrl = myconn.getdbUrl();
 		
 		
-		SQL = "INSERT INTO rcmods.FACT_GIC_STG " +
+		SQL = "INSERT INTO " + myDBIndex.getFlagged_Table() + " " +
 			  "("+
 			  "CLM_ID, " +
 			  "RULE_ID, " +
