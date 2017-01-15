@@ -282,9 +282,9 @@ public class DBRulesEngine {
 		
 		System.out.println();
 
-		SQL = "select COUNT(distinct Left_Sub_Rule_ID) count "
-				+ "from rcmods.Rule_Sheet_Left "
-				+ "where Rule_ID = " + ruleID;
+		SQL = "select COUNT(distinct Left_Sub_Rule_ID) count " + 
+				"from " + myDBIndex.getRS_Left() + " " + 
+				"where Rule_ID = " + ruleID;
 
 		left_sub_count = myconn.execSQL_returnint(SQL); 
 
