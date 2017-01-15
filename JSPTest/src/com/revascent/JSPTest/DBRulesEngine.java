@@ -150,7 +150,9 @@ public class DBRulesEngine {
 	public static String getRuleName(int rulecounter) {
 		// TODO Auto-generated method stub
 		//int RuleID = RuleList.get(rulecounter);
-		SQL = "select distinct Rule_Name from rcmods.Rule_sheet_Index where Rule_ID = " + rulecounter;
+		SQL = "select distinct Rule_Name " + 
+			  "from " + myDBIndex.getRS_Index() + " " +  
+			  "where Rule_ID = " + rulecounter;
 		
 		dbUrl = myconn.getdbUrl();
 		String RuleName;
@@ -198,7 +200,9 @@ public class DBRulesEngine {
 	
 	public static int getRuleClaimCount(int rulenum){
 		
-		SQL = "select COUNT(distinct CLM_ID) as count from rcmods.FACT_GIC_STG where Rule_ID = " + rulenum + " and RUN_ID = " + Run_ID + " group by Rule_ID";	
+		SQL = "select COUNT(distinct CLM_ID) as count " + 
+			  "from " + myDBIndex.getFlagged_Table() + " " +  
+			  "where Rule_ID = " + rulenum + " and RUN_ID = " + Run_ID + " group by Rule_ID";	
 		int ruleclaimcouunt = myconn.execSQL_returnint(SQL);
 		return ruleclaimcouunt;
 	}
