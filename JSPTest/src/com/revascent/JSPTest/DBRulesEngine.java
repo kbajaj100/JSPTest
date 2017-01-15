@@ -358,13 +358,13 @@ public class DBRulesEngine {
 		if (lefttype == 1) 
 		{
 			SQL = 	"select distinct CLM_ID CLM_ID " + 
-					"from rcmdw.FACT_CLAIM_DETAIL " +
+					"from " + myDBIndex.getClaims_Table() + " " +
 					"where CLM_ID in " +
 					"(select CLM_ID " + 
-					"from rcmdw.FACT_CLAIM_DETAIL " + 
+					"from " + myDBIndex.getClaims_Table() + " " + 
 					"where CPT_CODE = " +  
 					"(select distinct Rule_Primary_Code " + 
-					"from rcmods.Rule_Sheet_Left " + 
+					"from " + myDBIndex.getRS_Left() + " " +  
 					"where Rule_ID = " + ruleID + " " +  
 					"and Left_Sub_Rule_ID = " + left_sub_counter + " " +  
 					") " + 
