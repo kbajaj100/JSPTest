@@ -223,7 +223,9 @@ public class DBRulesEngine {
 	public int getRuleTypeNums(int ruleID) {
 		// Get the number of rule types for a given RuleID
 		
-		SQL = "select count(distinct Right_Rule_Type_ID) count from rcmods.Rule_Sheet where Rule_ID = " + ruleID;
+		SQL = "select count(distinct Right_Rule_Type_ID) count " + 
+			  "from " + myDBIndex.getRS() + " " +  
+			  "where Rule_ID = " + ruleID;
 
 		count = myconn.execSQL_returnint(SQL);
 		return count;
@@ -234,8 +236,10 @@ public class DBRulesEngine {
 		// Gets the Right Rule Type ID 
 		int RuleTypeID;
 		
-		SQL = "select distinct Right_Rule_Type_ID count from rcmods.Rule_Sheet where Rule_ID = " + 
-				ruleNum + " and Rule_Type_Number = " + RuleTypeNum;
+		SQL = "select distinct Right_Rule_Type_ID count " + 
+			  "from " + myDBIndex.getRS() + " " +  
+			  "where Rule_ID = " + 
+			  ruleNum + " and Rule_Type_Number = " + RuleTypeNum;
 		
 		RuleTypeID = myconn.execSQL_returnint(SQL);
 		
@@ -247,7 +251,9 @@ public class DBRulesEngine {
 		// Gets the Rule Type ID 
 		int LeftRuleTypeID;
 		
-		SQL = "select distinct Left_Rule_Type_ID count from rcmods.Rule_Sheet_Left where Rule_ID = " + ruleNum;
+		SQL = "select distinct Left_Rule_Type_ID count " + 
+			  "from " + myDBIndex.getRS_Left() + " " + 
+			  "where Rule_ID = " + ruleNum;
 		
 		LeftRuleTypeID = myconn.execSQL_returnint(SQL);
 		
