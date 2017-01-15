@@ -84,7 +84,7 @@ public class DBRulesEngine {
 		
 		myconn.setDBConn("C:/Props/RulesEngine/DBprops.properties");
 		
-		SQL = "select COUNT(distinct Rule_ID) count from rcmods.Rule_sheet_Index";
+		SQL = "select COUNT(distinct Rule_ID) count from " + myDBIndex.RS_Index;
 	
 		count = myconn.execSQL_returnint(SQL);
 		
@@ -95,7 +95,10 @@ public class DBRulesEngine {
 	
 	public static void createRuleList(int count){
 		
-		SQL = "select Rule_ID from rcmods.Rule_sheet_Index where Status = 'A'";
+		SQL = "select Rule_ID " + 
+			  "from " + myDBIndex.getRS_Index() + " " + 
+			  "where Status = 'A'";
+		
 		dbUrl = myconn.getdbUrl();
 		int arrcounter = 0;
 		
