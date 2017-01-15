@@ -15,10 +15,15 @@ Number of Rules is: <%= DBExecute.getRuleCountAll() %>
 <%= DBExecute.getSQL() %>
 <br><br>
 <!-- Display the table and the active rules list here -->
-Active Rules Table
 
 <%
-int count = DBExecute.getRuleCount();
+int count = DBExecute.getRuleCount();%>
+<br>Active rule count is: <%= count %>
+<br><br>
+
+Active Rules Table
+
+<% 
 int[] rulelist = new int[count];
 
 for(int i = 0; i<count; ++i){

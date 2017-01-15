@@ -31,9 +31,11 @@ public class DBRulesEngine {
 	static int Run_ID = 0;
 	static LocalDateTime Datetime;
 	
+	static DBIndex myDBIndex = new DBIndex();
+	
 	public static int setRUN_ID(){
 		
-		SQL = "select max(RUN_ID) count from rcmods.FACT_GIC_STG";
+		SQL = "select max(RUN_ID) count from " + myDBIndex.getFlagged_Table();
 		
 		Run_ID = myconn.execSQL_returnint(SQL);
 		++Run_ID;
@@ -66,7 +68,8 @@ public class DBRulesEngine {
 		
 		myconn.setDBConn("C:/Props/RulesEngine/DBprops.properties");
 		
-		SQL = "select COUNT(distinct Rule_ID) count from rcmods.Rule_sheet_Index where Status = 'A'";
+		SQL = "select COUNT(distinct Rule_ID) count from " + 
+			   myDBIndex.getRS_Index() + " where Status = 'A'";
 	
 		count = myconn.execSQL_returnint(SQL);
 		
@@ -263,6 +266,7 @@ public class DBRulesEngine {
 	public void ExecRule_123_Left(int ruleID, int RightRuleType, int RuleTypeNumber, int runID)
 	{
 
+		
 		System.out.println();
 
 		SQL = "select COUNT(distinct Left_Sub_Rule_ID) count "
@@ -271,31 +275,23 @@ public class DBRulesEngine {
 
 		left_sub_count = myconn.execSQL_returnint(SQL); 
 
-		String SQL_out;
-		/*if (left_sub_count == 1)
+		if (left_sub_count == 1)
 			ExecRule_Left_Sub_Count_1(ruleID, RightRuleType, RuleTypeNumber, runID);
-		else */
-		
-		SQL_out = Left_Sub_Count_GT1(ruleID, RightRuleType, RuleTypeNumber, runID, left_sub_count);
-		
-		System.out.println("SQL_out is: " + SQL_out);
-		ExecRule_Left(ruleID, RightRuleType, RuleTypeNumber, runID, SQL_out);
 		
 		ExecRule_1_Right(Claims, ruleID, RightRuleType, RuleTypeNumber, runID);
 		
 	}
 
-	private void ExecRule_Left(int ruleID, int RightRuleType, int RuleTypeNumber, int runID, String SQL_out) {
+	private void ExecRule_Left_Sub_Count_1(int ruleID, int RightRuleType, int RuleTypeNumber, int runID) {
 		// TODO Auto-generated method stub
 		
-		SQL = SQL_out;
 		dbUrl = myconn.getdbUrl();
 		int dummy = 1;
 		Claims = "(";
 
-		//for (int i = 1; i <= left_sub_count; ++i){
+		for (int i = 1; i <= left_sub_count; ++i){
 		
-			//SQL = getSQL_Left(ruleID, RightRuleType, RuleTypeNumber, i);
+			SQL = getSQL_Left(ruleID, RightRuleType, RuleTypeNumber, i);
 			
 				//System.out.println(SQL);
 				try {
@@ -334,33 +330,9 @@ public class DBRulesEngine {
 					if (stmt != null) try { stmt.close(); } catch(Exception e) {}
 					if (conn != null) try { conn.close(); } catch(Exception e) {}
 				}
-		//}
+		}
 	}
 
-	private String Left_Sub_Count_GT1(int ruleID, int RightRuleType, int RuleTypeNumber, int runID, int left_sub_count) {
-		//Method for cases where there are more than 1 left Sub rule
-		
-		String SQL_out = "select distinct o1.CLM_ID from (";
-		
-		for(int j = 1; j<= left_sub_count; ++j){
-		//Get the SQL for each of the Sub rules and construct the larger SQL statement
-			
-			SQL = getSQL_Left(ruleID, RightRuleType, RuleTypeNumber, j);
-			
-			if (j == 1)
-			{
-				SQL_out = SQL_out + SQL + ") o" + j;
-			}
-			else //if (j == left_sub_count)
-			{
-				SQL_out = SQL_out + " join (" + SQL +  ") o" + j + " on " + 
-						  "(o" + (j-1) + ".CLM_ID = o" + j + ".CLM_ID)";
-			}
-		}
-		
-		return SQL_out;
-	}
-	
 	private String getSQL_Left(int ruleID, int ruleType, int ruleTypeNumber, int left_sub_counter) {
 		// TODO Auto-generated method stub
 		System.out.println("Rule ID is : " + ruleID);
@@ -405,13 +377,13 @@ public class DBRulesEngine {
 					"from rcmdw.FACT_CLAIM_DETAIL " +
 					"where CPT_CODE in " +
 					"(select Rule_Primary_Code " +
-					"from rcmods.Rule_Sheet_Left " +
-					"where Rule_ID = " + ruleID + " " +
-					"and Left_Sub_Rule_ID = " + left_sub_counter + " " +
+					"from rcmods.Rule_Sheet_Left " + 
+					"where Rule_ID = " + ruleID + " " +  
+					"and Left_Sub_Rule_ID = " + left_sub_counter + " " +  
 					"and Rule_Left_Line_ID = 2) " +
 					"group by CLM_ID " +
 					"having COUNT(CPT_CODE) = 1) a12 on " +
-					"(a11.CLM_ID = a12.CLM_ID)";
+					"(a11.CLM_ID = a12.CLM_ID)"; 
 			System.out.println(SQL);
 		}
 		else if (lefttype == 3){
@@ -420,6 +392,7 @@ public class DBRulesEngine {
 			//System.out.println(SQL);
 			
 			SQL = "select CLM_ID CLM_ID, count(CPT_SEQUENCE_ID) count from rcmdw.FACT_CLAIM_DETAIL where CPT_Code in " + SQL_in + " group by CLM_ID";
+
 			
 		}
 		
@@ -531,7 +504,6 @@ public class DBRulesEngine {
 			}
 			else if (RightRuleType ==10)
 			{
-				//Flag claims where the CPT code does not occur even once
 				SQL = "select distinct a11.CLM_ID " +
 					  "from rcmdw.FACT_CLAIM_DETAIL a11 "+
 					  "where a11.CLM_ID in " +
